@@ -1,20 +1,29 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 
-# This matches the user/pass you created in Phase 1
-SQLALCHEMY_DATABASE_URL = "postgresql://care_admin:care123@localhost/careconnect"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL not set in .env")
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
-    # The connect_args is only needed for SQLite. Remove it if using PostgreSQL.
-    connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
+    DATABASE_URL,
+    pool_pre_ping=True
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
 
 Base = declarative_base()
 
-# Dependency to get a database session per request
+# FastAPI dependency
 def get_db():
     db = SessionLocal()
     try:

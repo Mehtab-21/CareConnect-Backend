@@ -1,0 +1,17 @@
+# Web Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# Database
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+
+# Admin Panel
+sqladmin==0.20.0
+
+# Environment Variables
+python-dotenv==1.0.1
+
+# Additional Dependencies
+pydantic==2.10.4
+typing-extensions==4.12.2
