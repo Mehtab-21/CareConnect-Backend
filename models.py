@@ -44,6 +44,7 @@ class Client(Base):
 # =========================
 # 4. DOCTORS
 # =========================
+
 class Doctor(Base):
     __tablename__ = "doctors"
     id = Column(Integer, primary_key=True, index=True)
@@ -53,15 +54,17 @@ class Doctor(Base):
     city = Column(String(50))
     zipcode = Column(String(10))
     
-    # Simple JSON storage for lists
-    languages = Column(JSON, nullable=True)  
+    languages = Column(JSON, nullable=True)
     insurance = Column(JSON, nullable=True)
+    
+    # --- NEW COLUMN ---
+    availability = Column(JSON, nullable=True, default={}) 
+    # Example format: {"Monday": "09:00-17:00", "Friday": "10:00-14:00"}
     
     consultation_type = Column(String(20))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     appointments = relationship("Appointment", back_populates="doctor")
-
 # =========================
 # 5. APPOINTMENTS
 # =========================
