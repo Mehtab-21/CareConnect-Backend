@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, Boolean, JSON, ForeignKey,
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
+from datetime import datetime
 
 # =========================
 # 1. ROLES
@@ -90,24 +91,28 @@ class Appointment(Base):
 # =========================
 class CallLog(Base):
     __tablename__ = "call_logs"
+
     id = Column(Integer, primary_key=True, index=True)
-
-    client_id = Column(Integer, ForeignKey("clients.id", ondelete="SET NULL"), index=True)
-
-    # VAPI Data
-    caller_id = Column(Text, nullable=True)
-    caller_number = Column(Text, nullable=True)
-    duration = Column(Text, nullable=True)
+    vapi_call_id = Column(String, unique=True, index=True)
     
-    # Content
-    transcript = Column(Text, nullable=True)
-    summary = Column(Text, nullable=True)
+    # --- Dashboard Fields ---
+    specialty = Column(String(100))        # "Dermatology"
+    summary = Column(Text)                 # "Patient reports skin rash..."
+    symptoms = Column(Text)                # "Rash on arms, Itching..."
     
-    # Medical Data
-    symptoms_detected = Column(Text, nullable=True)
-    appointment_intent = Column(Boolean, default=False)
+    # Rich Data (Stored as JSON lists)
+    patient_quotes = Column(JSON)          # ["skin rash", "allergic reaction"]
+    extracted_keywords = Column(JSON)      # ["rash", "arms", "itching"]
+    
+    # Full Context
+    transcript = Column(Text)              # "10:00 Patient: Hi..."
+    ai_action_summary = Column(Text)       # "Appointment details are AI-generated..."
+    
+    urgency_score = Column(Integer, default=5) 
+    status = Column(String(50), default="NEW") # "NEW", "REVIEWED"
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    vapi_data = Column(JSON, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
+    # Link to Patient
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
     client = relationship("Client", back_populates="call_logs")

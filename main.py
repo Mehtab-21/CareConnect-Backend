@@ -2,17 +2,36 @@ from fastapi import FastAPI
 from database import engine
 import models
 from admin_panel import setup_admin
+from fastapi.middleware.cors import CORSMiddleware
 
-# Import Routers
-from routes import doctors, appointments, call_logs, health
-
-# Create Tables automatically
-models.Base.metadata.create_all(bind=engine)
-
+# ==========================================
+# CREATE APP (ONLY ONCE)
+# ==========================================
 app = FastAPI()
 
 # ==========================================
-# 0. ADMIN DASHBOARD SETUP
+# CORS
+# ==========================================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Dev only
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ==========================================
+# IMPORT ROUTERS
+# ==========================================
+from routes import doctors, appointments, call_logs, health
+
+# ==========================================
+# DATABASE
+# ==========================================
+models.Base.metadata.create_all(bind=engine)
+
+# ==========================================
+# ADMIN PANEL
 # ==========================================
 setup_admin(app, engine)
 
